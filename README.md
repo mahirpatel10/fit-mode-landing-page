@@ -90,3 +90,7 @@ From this point, every push to the `main` branch triggers an automatic deploy. P
 | `index.html` | `no-cache, no-store, must-revalidate` |
 | `*.png` | `public, max-age=31536000, immutable` |
 | `*.woff2` | `public, max-age=31536000, immutable` |
+
+
+
+it is my fitness app
