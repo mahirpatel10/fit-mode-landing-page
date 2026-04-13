@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitMode — AI Personal Trainer App for Android</title>
+  <meta name="description" content="FitMode uses Google Gemini AI to generate personalized home workout plans, track your calories with just a photo, and coach you like a real personal trainer — all for free." />
+  <meta name="keywords" content="AI fitness trainer, home workout app, calorie tracker, Indian food tracker, Google Gemini AI, free fitness app, Android workout app" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="FitMode — Your AI Personal Trainer" />
+  <meta property="og:description" content="FitMode uses Google Gemini AI to generate personalized home workout plans, track your calories with just a photo, and coach you like a real personal trainer — all for free." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://fitmode.app" />
+  <meta property="og:image" content="https://fitmode.app/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="FitMode — Your AI Personal Trainer" />
+  <meta name="twitter:description" content="FitMode uses Google Gemini AI to generate personalized home workout plans, track your calories with just a photo, and coach you like a real personal trainer — all for free." />
+  <meta name="twitter:image" content="https://fitmode.app/og-image.png" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://fitmode.app" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       DESIGN TOKENS & RESET
+    ============================================================ */
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --accent: #00e676;
+      --accent-dim: rgba(0, 230, 118, 0.12);
+      --accent-glow: rgba(0, 230, 118, 0.35);
+      --text: #ffffff;
+      --text-muted: #888888;
+      --border: #222222;
+      --radius: 12px;
+      --nav-h: 68px;
+      --transition: 0.3s ease;
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Poppins', sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       TYPOGRAPHY UTILITIES
+    ============================================================ */
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      font-size: clamp(1rem, 2vw, 1.125rem);
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    .accent { color: var(--accent); }
+
+    .section-wrap {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       SCROLL ANIMATIONS
+    ============================================================ */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+    .fade-in-delay-4 { transition-delay: 0.4s; }
+    .fade-in-delay-5 { transition-delay: 0.5s; }
+    .fade-in-delay-6 { transition-delay: 0.6s; }
+
+    /* ============================================================
+       1. STICKY NAV
+    ============================================================ */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      transition: background var(--transition), backdrop-filter var(--transition), border-bottom var(--transition), box-shadow var(--transition);
+    }
+
+    #navbar.scrolled {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+      cursor: pointer;
+    }
+
+    .nav-logo span {
+      color: var(--text);
+      opacity: 0.7;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #000 !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      font-weight: 700 !important;
+      font-size: 0.875rem !important;
+      transition: background var(--transition), box-shadow var(--transition) !important;
+    }
+
+    .nav-cta:hover {
+      background: #00ff88 !important;
+      box-shadow: 0 0 20px var(--accent-glow) !important;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      gap: 5px;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 10, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 24px 2rem;
+      z-index: 999;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color var(--transition);
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--accent); }
+
+    .mobile-menu .mob-cta {
+      margin-top: 1rem;
+      background: var(--accent);
+      color: #000;
+      text-align: center;
+      padding: 0.875rem;
+      border-radius: var(--radius);
+      font-weight: 700;
+      border-bottom: none;
+    }
+
+    /* ============================================================
+       2. HERO
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: var(--nav-h);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(0, 230, 118, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 90% 90%, rgba(0, 200, 100, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 10% 20%, rgba(0, 100, 255, 0.04) 0%, transparent 60%),
+        var(--bg);
+      animation: heroBgPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes heroBgPulse {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    .hero-grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 230, 118, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 230, 118, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.9rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-headline {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5vw, 3.75rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-headline .line-accent {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero-subheadline {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+      max-width: 520px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--accent);
+      color: #000;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background: #00ff88;
+      box-shadow: 0 0 40px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .google-play-badge {
+      height: 52px;
+      width: auto;
+      border-radius: 8px;
+      transition: transform var(--transition), box-shadow var(--transition);
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+
+    .google-play-badge:hover {
+      transform: translateY(-2px) scale(1.03);
+      filter: drop-shadow(0 8px 20px rgba(0, 230, 118, 0.25));
+    }
+
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .hero-trust-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* Screenshot Carousel */
+    .hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      gap: 10px;
+    }
+
+    .screenshot-carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .sc-phone {
+      position: relative;
+      flex-shrink: 0;
+      transition: transform 0.45s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.45s ease,
+                  width 0.45s ease,
+                  height 0.45s ease;
+    }
+
+    .sc-phone--center {
+      width: 248px;
+      height: 496px;
+      z-index: 2;
+      opacity: 1;
+      transform: translateY(0);
+      animation: phoneFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes phoneFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    .sc-phone--side {
+      width: 185px;
+      height: 370px;
+      z-index: 1;
+      opacity: 0.55;
+    }
+
+    .sc-phone--left  { transform: rotate(-7deg) translateX(18px); }
+    .sc-phone--right { transform: rotate(7deg)  translateX(-18px); }
+
+    .sc-frame {
+      width: 100%;
+      height: 100%;
+      background: #0d0d0d;
+      border-radius: 36px;
+      border: 2px solid #2a2a2a;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 30px 70px rgba(0,0,0,0.75),
+        0 0 50px rgba(0,230,118,0.12);
+      position: relative;
+    }
+
+    .sc-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 18px;
+      background: #000;
+      border-radius: 0 0 12px 12px;
+      z-index: 3;
+    }
+
+    .sc-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .carousel-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+
+    .carousel-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    .carousel-btn:active { transform: scale(0.96); }
+
+    /* ============================================================
+       3. STATS BAR
+    ============================================================ */
+    #stats {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 20px 0;
+    }
+
+    .stats-track {
+      display: flex;
+      gap: 0;
+      animation: statsScroll 30s linear infinite;
+      width: max-content;
+    }
+
+    .stats-track:hover { animation-play-state: paused; }
+
+    @keyframes statsScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .stats-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 0 2.5rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .stats-pill .pill-icon {
+      font-size: 1.1rem;
+    }
+
+    .stats-pill strong {
+      color: var(--text);
+    }
+
+    /* ============================================================
+       4. FEATURES
+    ============================================================ */
+    #features {
+      background: var(--bg);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .feature-card:hover {
+      border-color: rgba(0, 230, 118, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 230, 118, 0.08);
+      transform: translateY(-4px);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 2.25rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: var(--font-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       5. WHO IT'S FOR
+    ============================================================ */
+    #who {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .who-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .who-body {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .who-body .food-highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .who-emoji-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 2rem;
+    }
+
+    .who-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .who-tag {
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 230, 118, 0.25);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      border-radius: 50px;
+    }
+
+    /* ============================================================
+       6. HOW IT WORKS
+    ============================================================ */
+    #how {
+      background: var(--bg);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      position: relative;
+    }
+
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 52px;
+      left: calc(16.66% + 40px);
+      right: calc(16.66% + 40px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(0, 230, 118, 0.3), var(--accent));
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .step-card:hover {
+      border-color: rgba(0, 230, 118, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 230, 118, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .step-number {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-title {
+      font-family: var(--font-heading);
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       7. COMPARISON TABLE
+    ============================================================ */
+    #comparison {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .comparison-table thead tr {
+      background: #161616;
+    }
+
+    .comparison-table th {
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table th:first-child { text-align: left; }
+
+    .th-fitmode {
+      color: var(--accent);
+      background: rgba(0, 230, 118, 0.06);
+    }
+
+    .th-others {
+      color: var(--text-muted);
+    }
+
+    .comparison-table td {
+      padding: 1.1rem 1.5rem;
+      font-size: 0.9rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+
+    .comparison-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .td-fitmode {
+      background: rgba(0, 230, 118, 0.04);
+    }
+
+    .check-yes {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .check-no {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #ff4d4d;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .check-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    .check-icon.yes {
+      background: rgba(0, 230, 118, 0.2);
+      color: var(--accent);
+    }
+
+    .check-icon.no {
+      background: rgba(255, 77, 77, 0.2);
+      color: #ff4d4d;
+    }
+
+    /* ============================================================
+       8. FAQ ACCORDION
+    ============================================================ */
+    #faq {
+      background: var(--bg);
+    }
+
+    .faq-list {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color var(--transition);
+    }
+
+    .faq-item.open {
+      border-color: rgba(0, 230, 118, 0.35);
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      gap: 1rem;
+      transition: background var(--transition);
+    }
+
+    .faq-question:hover { background: rgba(255,255,255,0.02); }
+
+    .faq-toggle {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 400;
+      line-height: 1;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .faq-item.open .faq-toggle {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 400px;
+    }
+
+    .faq-answer-inner {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    /* ============================================================
+       9. FINAL CTA
+    ============================================================ */
+    #cta {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0, 230, 118, 0.1) 0%, transparent 70%),
+        var(--bg-card);
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 100px 24px;
+      text-align: center;
+    }
+
+    .cta-eyebrow {
+      display: inline-block;
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-headline {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-sub {
+      font-size: clamp(1rem, 2vw, 1.125rem);
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .cta-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .btn-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--accent);
+      color: #000;
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 800;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      position: relative;
+      animation: pulseGlow 2.5s ease-in-out infinite;
+      transition: transform var(--transition), background var(--transition);
+    }
+
+    .btn-pulse:hover {
+      transform: scale(1.05);
+      background: #00ff88;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4), 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 16px rgba(0, 230, 118, 0), 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    .cta-note {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .cta-note span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       10. FOOTER
+    ============================================================ */
+    #footer {
+      background: #070707;
+      border-top: 1px solid var(--border);
+      padding: 48px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .footer-tagline {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .footer-powered {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+    }
+
+    .footer-powered .powered-icon { font-size: 1rem; }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1.5rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    .footer-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    /* ============================================================
+       RESPONSIVE — TABLET
+    ============================================================ */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 48px;
+      }
+
+      .hero-cta-group { align-items: center; }
+      .hero-subheadline { margin: 0 auto 2.5rem; }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .steps-grid::before { display: none; }
+
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    @media (max-width: 640px) {
+      .section-wrap { padding: 60px 20px; }
+
+      .hero-inner { padding: 40px 20px 60px; }
+
+      .sc-phone--center { width: 200px; height: 400px; }
+      .sc-phone--side   { width: 148px; height: 296px; }
+
+      .comparison-table th,
+      .comparison-table td { padding: 0.875rem 1rem; }
+
+      .cta-inner { padding: 72px 20px; }
+    }
+
+    @media (max-width: 420px) {
+      .hero-headline { font-size: 1.9rem; }
+      .hero-trust { flex-direction: column; align-items: center; text-align: center; gap: 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       1. STICKY NAV
+  ============================================================ -->
+  <header id="navbar" role="banner">
+    <nav class="nav-inner" aria-label="Main navigation">
+      <a href="#" class="nav-logo" aria-label="FitMode home">FitMode</a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#cta" class="nav-cta">Download</a></li>
+      </ul>
+
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Menu -->
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+    <a href="#features" class="mob-link">Features</a>
+    <a href="#how" class="mob-link">How It Works</a>
+    <a href="#faq" class="mob-link">FAQ</a>
+    <a href="#cta" class="mob-cta">Download Free on Google Play</a>
+  </nav>
+
+  <main>
+
+    <!-- ============================================================
+         2. HERO
+    ============================================================ -->
+    <section id="hero" aria-label="Hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-grid-overlay" aria-hidden="true"></div>
+
+      <div class="hero-inner">
+        <div class="hero-content fade-in">
+          <div class="hero-badge" aria-label="Powered by Google Gemini AI">
+            <span>🤖</span>
+            <span>Powered by Google Gemini AI</span>
+          </div>
+
+          <h1 class="hero-headline">
+            Your AI Personal Trainer.
+            <span class="line-accent">Always in FitMode.</span>
+          </h1>
+
+          <p class="hero-subheadline">
+            FitMode uses Google Gemini AI to generate personalized home workout plans, track your calories with just a photo, and coach you like a real personal trainer — all for free.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#" class="btn-primary" aria-label="Download FitMode free on Google Play">
+              ▶ Download Free on Google Play
+            </a>
+
+            <a href="#" aria-label="Get FitMode on Google Play Store">
+              <img
+                src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                alt="Get it on Google Play"
+                class="google-play-badge"
+                width="200"
+                height="77"
+                loading="eager"
+              />
+            </a>
+
+            <div class="hero-trust">
+              <div class="hero-trust-dot" aria-hidden="true"></div>
+              Free forever · No credit card · No equipment needed
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual fade-in fade-in-delay-3">
+
+          <button class="carousel-btn" id="carouselPrev" aria-label="Previous screenshot">&#8592;</button>
+
+          <div class="screenshot-carousel" aria-label="App screenshots">
+            <div class="sc-phone sc-phone--side sc-phone--left" id="scLeft">
+              <div class="sc-frame">
+                <img id="scImgLeft" src="" alt="FitMode app screenshot" />
+              </div>
+            </div>
+            <div class="sc-phone sc-phone--center" id="scCenter">
+              <div class="sc-frame">
+                <img id="scImgCenter" src="" alt="FitMode app screenshot" />
+              </div>
+            </div>
+            <div class="sc-phone sc-phone--side sc-phone--right" id="scRight">
+              <div class="sc-frame">
+                <img id="scImgRight" src="" alt="FitMode app screenshot" />
+              </div>
+            </div>
+          </div>
+
+          <button class="carousel-btn" id="carouselNext" aria-label="Next screenshot">&#8594;</button>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         3. STATS BAR
+    ============================================================ -->
+    <section id="stats" aria-label="Key features highlight">
+      <div class="stats-track" aria-hidden="true">
+        <!-- Original set -->
+        <div class="stats-pill"><span class="pill-icon">🤖</span> <strong>Powered by Google Gemini AI</strong></div>
+        <div class="stats-pill"><span class="pill-icon">🏠</span> <strong>100% Home Workouts — No Equipment</strong></div>
+        <div class="stats-pill"><span class="pill-icon">🍛</span> <strong>Recognizes Indian Foods</strong></div>
+        <div class="stats-pill"><span class="pill-icon">💰</span> <strong>Completely Free</strong></div>
+        <div class="stats-pill"><span class="pill-icon">📱</span> <strong>Available on Android</strong></div>
+        <!-- Duplicate for seamless loop -->
+        <div class="stats-pill"><span class="pill-icon">🤖</span> <strong>Powered by Google Gemini AI</strong></div>
+        <div class="stats-pill"><span class="pill-icon">🏠</span> <strong>100% Home Workouts — No Equipment</strong></div>
+        <div class="stats-pill"><span class="pill-icon">🍛</span> <strong>Recognizes Indian Foods</strong></div>
+        <div class="stats-pill"><span class="pill-icon">💰</span> <strong>Completely Free</strong></div>
+        <div class="stats-pill"><span class="pill-icon">📱</span> <strong>Available on Android</strong></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. FEATURES
+    ============================================================ -->
+    <section id="features" aria-labelledby="features-title">
+      <div class="section-wrap">
+        <h2 class="section-title fade-in" id="features-title">
+          Everything you need. <span class="accent">Nothing you don't.</span>
+        </h2>
+        <p class="section-subtitle fade-in fade-in-delay-1">
+          Six powerful features, all driven by AI — designed for real people, real homes, and real Indian lives.
+        </p>
+
+        <div class="features-grid">
+          <article class="feature-card fade-in fade-in-delay-1">
+            <span class="feature-icon" aria-hidden="true">🏋️</span>
+            <h3 class="feature-title">AI-Personalized Workouts</h3>
+            <p class="feature-desc">
+              Tell FitMode your age, fitness level, and goals — and Google Gemini AI builds a custom workout plan just for you. Every plan is designed for home, zero equipment needed. It adapts as you progress, getting harder when you're ready.
+            </p>
+          </article>
+
+          <article class="feature-card fade-in fade-in-delay-2">
+            <span class="feature-icon" aria-hidden="true">📸</span>
+            <h3 class="feature-title">Scan Food. Track Calories.</h3>
+            <p class="feature-desc">
+              Just take a photo of your meal — dal, roti, biryani, anything — and FitMode's AI identifies it and logs the calories instantly. No manual searching, no guesswork. The only calorie tracker that truly understands Indian cuisine.
+            </p>
+          </article>
+
+          <article class="feature-card fade-in fade-in-delay-3">
+            <span class="feature-icon" aria-hidden="true">🤖</span>
+            <h3 class="feature-title">Your 24/7 AI Coach</h3>
+            <p class="feature-desc">
+              Ask anything — form tips, nutrition advice, motivation, rest day guidance. FitMode's AI coach is always available, always personalized, and never judges. It's like having a personal trainer in your pocket around the clock.
+            </p>
+          </article>
+
+          <article class="feature-card fade-in fade-in-delay-4">
+            <span class="feature-icon" aria-hidden="true">⏱️</span>
+            <h3 class="feature-title">Follow-Along Workouts</h3>
+            <p class="feature-desc">
+              Step-by-step guided workouts with timers, rest countdowns, and clear instructions for every exercise. No more confusion about what to do next. Just open FitMode, press start, and follow along — it's that simple.
+            </p>
+          </article>
+
+          <article class="feature-card fade-in fade-in-delay-5">
+            <span class="feature-icon" aria-hidden="true">🔥</span>
+            <h3 class="feature-title">Smart Calorie Tracking</h3>
+            <p class="feature-desc">
+              Track daily calorie intake and calories burned in one unified dashboard. FitMode shows your net calories, macronutrient breakdown, and weekly trends — helping you understand your body and stay on track toward your goals.
+            </p>
+          </article>
+
+          <article class="feature-card fade-in fade-in-delay-6">
+            <span class="feature-icon" aria-hidden="true">📅</span>
+            <h3 class="feature-title">Full History Tracking</h3>
+            <p class="feature-desc">
+              Every workout, every meal, every calorie — logged and stored in a clean timeline. Look back at your progress over days, weeks, and months. Celebrate your streaks, spot patterns, and stay motivated with real data about your journey.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. WHO IT'S FOR
+    ============================================================ -->
+    <section id="who" aria-labelledby="who-title">
+      <div class="section-wrap">
+        <div class="who-inner">
+          <h2 class="section-title fade-in" id="who-title">
+            Built for India. <span class="accent">Built for You.</span>
+          </h2>
+
+          <div class="who-emoji-row fade-in fade-in-delay-1" aria-label="Indian foods: curry, flatbread, rice, sabzi">
+            <span role="img" aria-label="Indian curry">🍛</span>
+            <span role="img" aria-label="Roti flatbread">🫓</span>
+            <span role="img" aria-label="Rice">🍚</span>
+            <span role="img" aria-label="Sabzi vegetable dish">🥘</span>
+          </div>
+
+          <p class="who-body fade-in fade-in-delay-2">
+            Most fitness apps are built for the West — they don't know what
+            <span class="food-highlight">Dal Roti</span>,
+            <span class="food-highlight">Biryani</span>, or
+            <span class="food-highlight">Sabzi</span>
+            are. FitMode is different. Our AI is trained to recognize and accurately track the foods you actually eat every day — from home-cooked desi meals to street food favorites.
+          </p>
+
+          <p class="who-body fade-in fade-in-delay-3">
+            And for workouts? No gym membership. No expensive equipment. FitMode delivers 100% home workouts tailored to your fitness level — whether you're a complete beginner starting from scratch or an advanced athlete pushing your limits. Real results, from your living room.
+          </p>
+
+          <div class="who-tags fade-in fade-in-delay-4">
+            <span class="who-tag">🇮🇳 Made for Indian Diet</span>
+            <span class="who-tag">🏠 Home Workouts Only</span>
+            <span class="who-tag">🌱 Beginner Friendly</span>
+            <span class="who-tag">💪 Advanced Plans Too</span>
+            <span class="who-tag">💰 Always Free</span>
+            <span class="who-tag">📱 Android App</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         6. HOW IT WORKS
+    ============================================================ -->
+    <section id="how" aria-labelledby="how-title">
+      <div class="section-wrap">
+        <h2 class="section-title fade-in" id="how-title">
+          Get fit in <span class="accent">3 simple steps</span>
+        </h2>
+        <p class="section-subtitle fade-in fade-in-delay-1">
+          From download to your first workout in under 3 minutes. No complicated setup, no subscriptions.
+        </p>
+
+        <div class="steps-grid">
+          <div class="step-card fade-in fade-in-delay-1">
+            <div class="step-number" aria-hidden="true">1️⃣</div>
+            <h3 class="step-title">Set Up Your Profile</h3>
+            <p class="step-desc">
+              Tell FitMode your name, age, weight, height, fitness goal (lose fat, gain muscle, or stay fit), and current fitness level. Takes less than 60 seconds. No email required to get started.
+            </p>
+          </div>
+
+          <div class="step-card fade-in fade-in-delay-2">
+            <div class="step-number" aria-hidden="true">2️⃣</div>
+            <h3 class="step-title">Get Your AI Plan</h3>
+            <p class="step-desc">
+              Google Gemini AI instantly generates a fully personalized weekly workout schedule and a daily calorie target based on your unique profile. Your plan adapts as you grow stronger and fitter over time.
+            </p>
+          </div>
+
+          <div class="step-card fade-in fade-in-delay-3">
+            <div class="step-number" aria-hidden="true">3️⃣</div>
+            <h3 class="step-title">Start Your Journey</h3>
+            <p class="step-desc">
+              Follow your daily workouts, scan your meals with your camera, chat with your AI coach, and watch your transformation unfold. Track every rep, every calorie, every milestone — all in one beautiful app.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         7. COMPARISON TABLE
+    ============================================================ -->
+    <section id="comparison" aria-labelledby="comparison-title">
+      <div class="section-wrap">
+        <h2 class="section-title fade-in" id="comparison-title">
+          Why FitMode <span class="accent">beats the rest</span>
+        </h2>
+        <p class="section-subtitle fade-in fade-in-delay-1">
+          See how FitMode stacks up against other fitness apps on the market.
+        </p>
+
+        <div class="comparison-table-wrap fade-in fade-in-delay-2">
+          <table class="comparison-table" role="table" aria-label="FitMode vs other fitness apps comparison">
+            <thead>
+              <tr>
+                <th scope="col">Feature</th>
+                <th scope="col" class="th-fitmode">FitMode ✨</th>
+                <th scope="col" class="th-others">Other Apps</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AI Personalized Plans</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Free
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    Paid
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Food Photo Scanning</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Yes
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    Manual only
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Recognizes Indian Food</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Yes
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    No
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>AI Coach Chat</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Yes
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    No
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>No Equipment Needed</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Yes
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    Gym required
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Completely Free</td>
+                <td class="td-fitmode">
+                  <span class="check-yes">
+                    <span class="check-icon yes" aria-hidden="true">✓</span>
+                    Yes
+                  </span>
+                </td>
+                <td>
+                  <span class="check-no">
+                    <span class="check-icon no" aria-hidden="true">✕</span>
+                    Subscription
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         8. FAQ ACCORDION
+    ============================================================ -->
+    <section id="faq" aria-labelledby="faq-title">
+      <div class="section-wrap">
+        <h2 class="section-title fade-in" id="faq-title">
+          Frequently Asked <span class="accent">Questions</span>
+        </h2>
+        <p class="section-subtitle fade-in fade-in-delay-1">
+          Got questions? We've got answers.
+        </p>
+
+        <div class="faq-list fade-in fade-in-delay-2" role="list">
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-1"
+              id="faq-btn-1"
+            >
+              Is FitMode really completely free?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-1" role="region" aria-labelledby="faq-btn-1">
+              <p class="faq-answer-inner">
+                Yes, 100% free — no credit card, no subscription, no hidden fees. FitMode is committed to making AI-powered fitness accessible to everyone. All features including AI workout plans, food photo scanning, and AI coach chat are available at zero cost. We believe fitness should not be a luxury, and we're keeping it that way.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-2"
+              id="faq-btn-2"
+            >
+              Do I need a gym or any equipment?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-2" role="region" aria-labelledby="faq-btn-2">
+              <p class="faq-answer-inner">
+                Absolutely not. FitMode is designed entirely around home workouts with zero equipment. All exercises use only your bodyweight — push-ups, squats, planks, lunges, and more. Whether you're in a small apartment or a large house, FitMode will create a program that works for your space. No gym membership ever required.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-3"
+              id="faq-btn-3"
+            >
+              Can it really recognize Indian food from photos?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-3" role="region" aria-labelledby="faq-btn-3">
+              <p class="faq-answer-inner">
+                Yes! This is one of FitMode's most powerful features. Powered by Google Gemini AI's vision capabilities, FitMode can identify hundreds of Indian dishes — dal, roti, biryani, sabzi, idli, dosa, paneer dishes, and much more. It provides accurate calorie estimates based on typical serving sizes. It handles mixed plates, thalis, and even homestyle variations of classic dishes.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-4"
+              id="faq-btn-4"
+            >
+              How does the AI personalize my workout plan?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-4" role="region" aria-labelledby="faq-btn-4">
+              <p class="faq-answer-inner">
+                When you set up your profile, you share your age, weight, height, fitness goal (fat loss, muscle building, or general fitness), and current fitness level (beginner, intermediate, or advanced). Google Gemini AI processes this data and generates a multi-week progressive workout plan tailored specifically to you. As you complete workouts and log progress, the plan adapts to keep challenging you at the right intensity.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-5"
+              id="faq-btn-5"
+            >
+              Is FitMode suitable for complete beginners?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-5" role="region" aria-labelledby="faq-btn-5">
+              <p class="faq-answer-inner">
+                Absolutely! FitMode is built with beginners in mind. If you've never exercised before, select "Beginner" when setting up your profile and the AI will start you with gentle, manageable workouts that gradually build in difficulty as you get stronger. The AI coach is also there to answer any questions about form, technique, or how to modify exercises if something feels too hard.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-6"
+              id="faq-btn-6"
+            >
+              Which Android devices are supported?
+              <span class="faq-toggle" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-6" role="region" aria-labelledby="faq-btn-6">
+              <p class="faq-answer-inner">
+                FitMode works on any Android device running Android 8.0 (Oreo) or higher. This covers the vast majority of Android smartphones used in India today — from budget devices to flagship phones. The app is optimized to run smoothly even on lower-end hardware so everyone can access it, regardless of their device. It requires an internet connection for AI features like workout generation and food scanning.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         9. FINAL CTA
+    ============================================================ -->
+    <section id="cta" aria-labelledby="cta-title">
+      <div class="cta-bg" aria-hidden="true"></div>
+      <div class="cta-inner">
+        <span class="cta-eyebrow fade-in">Free Android App</span>
+
+        <h2 class="cta-headline fade-in fade-in-delay-1" id="cta-title">
+          Ready to get in <span class="accent">FitMode?</span>
+        </h2>
+
+        <p class="cta-sub fade-in fade-in-delay-2">
+          Download free on Google Play. No credit card. No equipment. Just results.
+        </p>
+
+        <div class="cta-btn-wrap fade-in fade-in-delay-3">
+          <a href="#" class="btn-pulse" aria-label="Download FitMode now, it's free">
+            ▶ Download Now — It's Free
+          </a>
+
+          <a href="#" aria-label="Get it on Google Play">
+            <img
+              src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+              alt="Get it on Google Play"
+              class="google-play-badge"
+              width="200"
+              height="77"
+              loading="lazy"
+            />
+          </a>
+
+          <p class="cta-note">
+            <span>100% Free</span> · No credit card · <span>Android only</span> · Powered by Google Gemini AI
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       10. FOOTER
+  ============================================================ -->
+  <footer id="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-logo" aria-label="FitMode">FitMode</div>
+
+      <p class="footer-tagline">AI Fitness Trainer · Built with ❤️ for India</p>
+
+      <div class="footer-powered">
+        <span class="powered-icon" aria-hidden="true">🤖</span>
+        Powered by Google Gemini AI
+      </div>
+
+      <div class="footer-divider" aria-hidden="true"></div>
+
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact</a>
+      </nav>
+
+      <p class="footer-copy">
+        &copy; 2026 FitMode. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script>
+    // -------------------------------------------------------
+    // Sticky Nav — add .scrolled class after 50px
+    // -------------------------------------------------------
+    (function () {
+      var navbar = document.getElementById('navbar');
+      var lastScroll = 0;
+
+      function handleScroll() {
+        var scrollY = window.scrollY || window.pageYOffset;
+        if (scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+        lastScroll = scrollY;
+      }
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll(); // run on load
+    })();
+
+    // -------------------------------------------------------
+    // Hamburger mobile menu
+    // -------------------------------------------------------
+    (function () {
+      var hamburger = document.getElementById('hamburger');
+      var mobileMenu = document.getElementById('mobileMenu');
+
+      function toggleMenu() {
+        var isOpen = mobileMenu.classList.contains('open');
+        if (isOpen) {
+          mobileMenu.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        } else {
+          mobileMenu.classList.add('open');
+          hamburger.classList.add('open');
+          hamburger.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      hamburger.addEventListener('click', toggleMenu);
+
+      // Close menu when a link is clicked
+      var mobLinks = mobileMenu.querySelectorAll('a');
+      mobLinks.forEach(function (link) {
+        link.addEventListener('click', function () {
+          mobileMenu.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Close menu on outside click
+      document.addEventListener('click', function (e) {
+        if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+          mobileMenu.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+
+    // -------------------------------------------------------
+    // FAQ Accordion with aria-expanded
+    // -------------------------------------------------------
+    (function () {
+      var faqItems = document.querySelectorAll('.faq-item');
+
+      faqItems.forEach(function (item) {
+        var btn = item.querySelector('.faq-question');
+        var toggle = item.querySelector('.faq-toggle');
+
+        btn.addEventListener('click', function () {
+          var isOpen = item.classList.contains('open');
+
+          // Close all open items
+          faqItems.forEach(function (otherItem) {
+            if (otherItem !== item) {
+              otherItem.classList.remove('open');
+              var otherBtn = otherItem.querySelector('.faq-question');
+              var otherToggle = otherItem.querySelector('.faq-toggle');
+              otherBtn.setAttribute('aria-expanded', 'false');
+              otherToggle.textContent = '+';
+            }
+          });
+
+          // Toggle current item
+          if (isOpen) {
+            item.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            toggle.textContent = '+';
+          } else {
+            item.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+            toggle.textContent = '−';
+          }
+        });
+      });
+    })();
+
+    // -------------------------------------------------------
+    // IntersectionObserver — .fade-in → .visible
+    // -------------------------------------------------------
+    (function () {
+      if (!('IntersectionObserver' in window)) {
+        // Fallback: make everything visible immediately
+        var elements = document.querySelectorAll('.fade-in');
+        elements.forEach(function (el) {
+          el.classList.add('visible');
+        });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.12,
+          rootMargin: '0px 0px -40px 0px'
+        }
+      );
+
+      var fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(function (el) {
+        observer.observe(el);
+      });
+    })();
+
+    // -------------------------------------------------------
+    // Smooth scroll for anchor links
+    // -------------------------------------------------------
+    (function () {
+      var anchors = document.querySelectorAll('a[href^="#"]');
+      anchors.forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+          var href = anchor.getAttribute('href');
+          if (href === '#') return; // Allow default for pure # links
+
+          var target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            var navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'), 10) || 68;
+            var targetPos = target.getBoundingClientRect().top + window.scrollY - navHeight - 16;
+            window.scrollTo({ top: targetPos, behavior: 'smooth' });
+          }
+        });
+      });
+    })();
+
+    // -------------------------------------------------------
+    // Screenshot Carousel
+    // -------------------------------------------------------
+    (function () {
+      var screenshots = [
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%202.28.42%20PM.jpeg',  alt: 'FitMode splash screen' },
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%203.35.37%20PM.jpeg',  alt: 'FitMode home dashboard' },
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%203.35.51%20PM.jpeg',  alt: 'FitMode workout screen' },
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%203.36.13%20PM.jpeg',  alt: 'FitMode nutrition screen' },
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%203.36.26%20PM.jpeg',  alt: 'FitMode AI coach screen' },
+        { src: 'photos/WhatsApp%20Image%202026-04-12%20at%203.39.29%20PM.jpeg',  alt: 'FitMode AI food scan' }
+      ];
+
+      var total = screenshots.length;
+      var current = 1; // start on home dashboard as center
+
+      var imgLeft   = document.getElementById('scImgLeft');
+      var imgCenter = document.getElementById('scImgCenter');
+      var imgRight  = document.getElementById('scImgRight');
+      var btnPrev   = document.getElementById('carouselPrev');
+      var btnNext   = document.getElementById('carouselNext');
+
+      function mod(n, m) { return ((n % m) + m) % m; }
+
+      function render() {
+        var li = mod(current - 1, total);
+        var ri = mod(current + 1, total);
+        imgLeft.src   = screenshots[li].src;  imgLeft.alt   = screenshots[li].alt;
+        imgCenter.src = screenshots[current].src; imgCenter.alt = screenshots[current].alt;
+        imgRight.src  = screenshots[ri].src;  imgRight.alt  = screenshots[ri].alt;
+      }
+
+      btnPrev.addEventListener('click', function () {
+        current = mod(current - 1, total);
+        render();
+      });
+
+      btnNext.addEventListener('click', function () {
+        current = mod(current + 1, total);
+        render();
+      });
+
+      render(); // initial paint
+    })();
+  </script>
+
+</body>
+</html>
